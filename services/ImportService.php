@@ -865,8 +865,7 @@ class ImportService extends BaseApplicationComponent
         // Loop through keywords
         foreach ($search as $query) {
 
-            // Find matching element by URI (dirty, not all categories have URI's)
-            $criteria->uri = $categoryUrl.$this->slugify($query);
+            $criteria->search = $query;
 
             // Add to data
             $data = array_merge($data, $criteria->ids());
