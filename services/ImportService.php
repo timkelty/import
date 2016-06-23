@@ -341,6 +341,7 @@ class ImportService extends BaseApplicationComponent
                     break;
 
                 case ImportModel::FieldTypeCategories:
+                case ImportModel::FieldTypeSimpleCategories:
 
                     if (!empty($data)) {
                         $data = $this->prepCategoriesFieldType($data, $field);
