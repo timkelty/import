@@ -900,6 +900,7 @@ class ImportService extends BaseApplicationComponent
         $criteria = craft()->elements->getCriteria(ElementType::Entry);
         $criteria->sectionId = $sectionIds;
         $criteria->limit = $settings->limit;
+        $criteria->status = null;
 
         // Get search strings
         $search = ArrayHelper::stringToArray($data);
