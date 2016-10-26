@@ -114,11 +114,14 @@ class ImportService extends BaseApplicationComponent
         // Set up a model to save according to element type
         $entry = $service->setModel($settings);
 
-        // If unique is non-empty array, we're replacing or deleting
+        // If unique is non-empty array, we may be replacing or deleting
         if (is_array($settings['unique']) && count($settings['unique']) > 1) {
-            $entry = $this->replaceOrDelete($row, $settings, $service, $fields, $entry);
-            if ($entry === null) {
+            $replacedEntry = $this->replaceOrDelete($row, $settings, $service, $fields, $entry);
+
+            if ($replacedEntry === null && $settings['behavior'] !== ImportModel::BehaviorAppend) {
                 return;
+            } elseif ($replacedEntry) {
+                $entry = $replacedEntry;
             }
         }
 
@@ -338,6 +341,7 @@ class ImportService extends BaseApplicationComponent
                     break;
 
                 case ImportModel::FieldTypeCategories:
+                case ImportModel::FieldTypeSimpleCategories:
 
                     if (!empty($data)) {
                         $data = $this->prepCategoriesFieldType($data, $field);
@@ -862,8 +866,7 @@ class ImportService extends BaseApplicationComponent
         // Loop through keywords
         foreach ($search as $query) {
 
-            // Find matching element by URI (dirty, not all categories have URI's)
-            $criteria->uri = $categoryUrl.$this->slugify($query);
+            $criteria->search = $query;
 
             // Add to data
             $data = array_merge($data, $criteria->ids());
@@ -897,6 +900,7 @@ class ImportService extends BaseApplicationComponent
         $criteria = craft()->elements->getCriteria(ElementType::Entry);
         $criteria->sectionId = $sectionIds;
         $criteria->limit = $settings->limit;
+        $criteria->status = null;
 
         // Get search strings
         $search = ArrayHelper::stringToArray($data);
